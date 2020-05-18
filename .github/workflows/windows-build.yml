@@ -1,0 +1,30 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+#    - name: Install packages
+#      run: sudo apt install libpcap-dev
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build
+      run: |
+        cd HPSDRBootloader
+        qmake
+        make
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: HPSDRBootloader-win64-${{ github.run_number }}-${{ github.sha }}
+        path: HPSDRBootloader/HPSDRBootloader
