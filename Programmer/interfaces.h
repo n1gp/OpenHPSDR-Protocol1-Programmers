@@ -27,7 +27,7 @@
 #define INTERFACES_H
 
 #include <sys/types.h>
-#ifndef __WIN32
+#if !defined(_WIN32) && !defined(_WIN64)
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
