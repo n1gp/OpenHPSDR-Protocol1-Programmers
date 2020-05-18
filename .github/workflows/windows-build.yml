@@ -23,7 +23,7 @@ jobs:
     - name: Build
       run: |
         cd HPSDRBootloader
-        qmake
+        qmake -t vcapp
         msbuild
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
