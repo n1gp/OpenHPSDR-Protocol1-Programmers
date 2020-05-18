@@ -26,4 +26,5 @@ jobs:
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
       with:
+        name: HPSDRBootloader-linux-x64-${{ github.run_number }}-${{ github.sha }}
         path: HPSDRBootloader/HPSDRBootloader
