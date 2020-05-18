@@ -15,7 +15,7 @@ jobs:
 #    - name: Install packages
 #      run: sudo apt install libpcap-dev
     - name: Add Visual Studio to PATH
-      uses: uses: ilammy/msvc-dev-cmd@v1
+      uses: ilammy/msvc-dev-cmd@v1
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
     - name: Checkout code
