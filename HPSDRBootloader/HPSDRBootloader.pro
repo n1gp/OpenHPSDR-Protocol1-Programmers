@@ -22,9 +22,9 @@ include( ../Resources/Resources.pri )
 win32 {
     INCLUDEPATH += "../WpdPack/Include"
     !contains(QMAKE_TARGET.arch, x86_64) {
-        LIBS += "../WpdPack/Lib/x64/wpcap.lib"
-    } else {
         LIBS += "../WpdPack/Lib/wpcap.lib"
+    } else {
+        LIBS += "../WpdPack/Lib/x64/wpcap.lib"
     }
     LIBS += "ws2_32.lib"
 }
