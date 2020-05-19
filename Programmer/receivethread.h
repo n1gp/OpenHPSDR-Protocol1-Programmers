@@ -4,7 +4,6 @@
 #include <sys/types.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include <winsock2.h>
-#define socklen_t int
 #else
 #include <sys/select.h>
 #include <sys/socket.h>
