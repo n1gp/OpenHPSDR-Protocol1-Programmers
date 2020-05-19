@@ -24,6 +24,7 @@ jobs:
       run: |
         Invoke-WebRequest -Uri https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip -OutFile WdpPack.zip
         7z x WdpPack.zip
+        dir -r
     - name: Build
       run: |
         cd HPSDRBootloader
