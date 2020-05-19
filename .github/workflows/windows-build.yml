@@ -16,6 +16,8 @@ jobs:
 #      run: sudo apt install libpcap-dev
     - name: Add Visual Studio to PATH
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x86
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
     - name: Checkout code
@@ -33,5 +35,5 @@ jobs:
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: HPSDRBootloader-win64-${{ github.run_number }}-${{ github.sha }}
+        name: HPSDRBootloader-win32-${{ github.run_number }}-${{ github.sha }}
         path: HPSDRBootloader/HPSDRBootloader
