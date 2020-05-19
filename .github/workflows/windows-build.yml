@@ -20,6 +20,10 @@ jobs:
       uses: jurplel/install-qt-action@v2
     - name: Checkout code
       uses: actions/checkout@v2
+    - name: Install WinPCAP development files
+      run: |
+        Invoke-WebRequest -Uri https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip -OutFile WdpPack.zip
+        7z x WdpPack.zip
     - name: Build
       run: |
         cd HPSDRBootloader
