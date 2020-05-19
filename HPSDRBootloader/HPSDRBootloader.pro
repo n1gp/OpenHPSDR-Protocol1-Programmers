@@ -20,8 +20,8 @@ include( ../Resources/Resources.pri )
 
 
 win32 {
-    INCLUDEPATH += "C:/src/WpdPack_4_1_2/WpdPack/Include"
-    LIBS += "C:/src/WpdPack_4_1_2/WpdPack/Lib/wpcap.lib" "C:/Qt/Qt5.6.2/Tools/mingw492_32/i686-w64-mingw32/lib/libwsock32.a"
+    INCLUDEPATH += "../WpdPack/Include"
+    LIBS += "../WpdPack/Lib/wpcap.lib" "ws2_32.lib"
  }
 
 macx {
@@ -45,9 +45,3 @@ HEADERS  += mainwindow.h \
 
 
 FORMS    += mainwindow.ui
-
-
-
-
-
-
