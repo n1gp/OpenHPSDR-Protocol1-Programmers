@@ -36,4 +36,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: HPSDRBootloader-win32-${{ github.run_number }}-${{ github.sha }}
-        path: HPSDRBootloader/HPSDRBootloader.exe
+        path: HPSDRBootloader/debug/HPSDRBootloader.exe
