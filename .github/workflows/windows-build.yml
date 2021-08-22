@@ -33,7 +33,7 @@ jobs:
         qmake -t vcapp
         msbuild
         cd ..
-        dir Qt5Gui.dll /s
+        Get-Childitem Qt5Gui.dll -Recurse
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
       with:
