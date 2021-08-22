@@ -32,6 +32,7 @@ jobs:
         cd HPSDRProgrammerV2-nopcap
         qmake -t vcapp
         msbuild
+        find . -iname Qt5Gui.dll -print
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
       with:
@@ -41,4 +42,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: dllfiles
-        path: C:\Qt\Tools\mingw482_32\i686-w64-mingw32\bin\*.dll
+        path: Qt/Tools/mingw482_32/i686-w64-mingw32/bin/*.dll
