@@ -27,4 +27,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: HPSDRProgrammerV2-nopcap-linux-x64-${{ github.run_number }}-${{ github.sha }}
-        path: HPSDRProgrammerV2-nopcap/HPSDRProgrammerV2-nopcap
+        path: HPSDRProgrammerV2-nopcap
