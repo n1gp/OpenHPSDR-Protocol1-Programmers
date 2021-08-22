@@ -43,4 +43,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: dllfiles
-        path: ${{Qt5_Dir}}/bin/*.dll
+        path: D:/a/OpenHPSDR-Protocol1-Programmers/Qt/5.15.2/msvc2019_64/bin/*.dll
