@@ -24,6 +24,8 @@
 #define PROGRAM_PENELOPE    0x08
 #define JTAG_ERASE_FLASH    0x09
 #define PROGRAM_FLASH       0x0A
+#define PROGRAM_METIS_FLASH2	0x05
+#define ERASE_METIS_FLASH2	0x04
 
 // reply codes
 #define INVALID_COMMAND  0x00
@@ -68,7 +70,7 @@ signals:
 
 public slots:
     //void readyRead();
-    void changeIP(QStringList *saddr , unsigned char *macaddr);
+    void changeIP(QStringList *saddr , unsigned char *macaddr, Board*);
     void discovery();
     void update_discovery();
     void update_command();

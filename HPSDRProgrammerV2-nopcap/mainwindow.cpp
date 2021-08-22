@@ -309,7 +309,7 @@ void MainWindow::setIP_UDP()
 
     QStringList *saddr = new QStringList();
     add->getNewIPAddress(saddr);
-    wb->changeIP(saddr, wb->boards[wb->currentboard]->getMACAddress());
+    wb->changeIP(saddr, wb->boards[wb->currentboard]->getMACAddress(), wb->boards[wb->currentboard]);
 
     ui->discoverComboBox->clear();
     stat->status("Rediscovery.");

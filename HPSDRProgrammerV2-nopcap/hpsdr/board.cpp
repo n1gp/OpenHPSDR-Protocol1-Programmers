@@ -40,19 +40,22 @@
  *  the discovered HPSDR interface boards.
  */
 
-Board::Board(quint32 ipaddr,unsigned char* macaddr,unsigned char software_version,unsigned char board_type) {
+Board::Board(quint32 ipaddr,unsigned char* macaddr,unsigned char software_version,unsigned char board_type, unsigned char board_protocol, unsigned char beta_version) {
     ipaddress=ipaddr;
     for(int i=0;i<6;i++) {
         macaddress[i]=macaddr[i];
     }
     version=software_version;
+    bversion=beta_version;
     board=board_type;
+    protocol=board_protocol;
 
     boardtype[0] = "metis";
     boardtype[1] = "hermes";
     boardtype[2] = "griffin";
-    boardtype[4] = "angelia";
-    boardtype[5] = "orion";
+    boardtype[4] = (protocol == 1) ? "angelia" : "orion";
+    boardtype[5] = (protocol == 1) ? "orion" : "orion2";
+    boardtype[10] = (protocol == 1) ? "orion2" : "";
 
     jumper[0] = "J1";
     jumper[1] = "J12";
@@ -100,10 +103,10 @@ QString Board::getHostAddress() {
 
 QString Board::toAllString() {
     QString text;
-    text.sprintf("%02X:%02X:%02X:%02X:%02x:%02X (%d.%d.%d.%d) Software version: %d.%d (%s)",
+    text.sprintf("%02X:%02X:%02X:%02X:%02x:%02X (%d.%d.%d.%d) Software version: %d.%d.%d (%s) P%d",
                  macaddress[0],macaddress[1],macaddress[2],macaddress[3],macaddress[4],macaddress[5],
                  (ipaddress>>24)&0xFF,(ipaddress>>16)&0xFF,(ipaddress>>8)&0xFF,ipaddress&0xFF,
-                 version/10,version%10,boardtype[board].toStdString().c_str());
+                 version/10,version%10,bversion,boardtype[board].toStdString().c_str(), protocol);
     qDebug() << board << boardtype[0];
 
     return text;
@@ -155,6 +158,15 @@ QString Board::toMACString() {
     return text;
 }
 
+/*! \brief getProtocol()
+ *
+ *  This function returns the board protocol (1 or 2).
+ */
+
+unsigned char Board::getProtocol() {
+    return protocol;
+}
+
 /*! \brief getVersion()
  *
  *  This function returns the board version number.
@@ -162,6 +174,15 @@ QString Board::toMACString() {
 
 unsigned char Board::getVersion() {
     return version;
+}
+
+/*! \brief getBversion()
+ *
+ *  This function returns the board version number.
+ */
+
+unsigned char Board::getBversion() {
+    return bversion;
 }
 
 /*! \brief getVersion()

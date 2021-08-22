@@ -17,7 +17,7 @@ WriteBoard::~WriteBoard()
 
 }
 
-
+static quint16 recv_checksum=0, send_checksum=0;
 
 void WriteBoard::discovery()
 {
@@ -28,8 +28,9 @@ void WriteBoard::discovery()
     buffer[0]=(char)0xEF; //header
     buffer[1]=(char)0XFE;
     buffer[2]=(char)0x02;
+    buffer[4]=(char)0x02;
 
-    for(i=3;i<63;i++) {
+    for(i=5;i<63;i++) {
         buffer[i]=(char)0x00;
     }
 
@@ -111,15 +112,29 @@ void WriteBoard::sendCommand(unsigned char command, Board *bd) {
 
     qDebug()<<"sendCommand "<<command;
 
-    buffer[0]=0xEF; // protocol
-    buffer[1]=0xFE;
+    if (bd->getProtocol() == 1) {
+       buffer[0]=0xEF; // protocol
+       buffer[1]=0xFE;
 
-    buffer[2]=0x03;
-    buffer[3]=command;
+       buffer[2]=0x03;
+       buffer[3]=command;
 
-    /*fill the frame with 0x00*/
-    for(i=0;i<60;i++) {
-        buffer[i+4]=(unsigned char)0x00;
+       /*fill the frame with 0x00*/
+       for(i=0;i<60;i++) {
+           buffer[i+4]=(unsigned char)0x00;
+       }
+    } else { // protocol 2
+       buffer[0]=0x00;
+       buffer[1]=0x00;
+       buffer[2]=0x00;
+       buffer[3]=0x00;
+
+       buffer[4]=command;
+
+       /*fill the frame with 0x00*/
+       for(i=5;i<60;i++) {
+           buffer[i]=(unsigned char)0x00;
+       }
     }
 
     qDebug()<<"before send";
@@ -144,27 +159,43 @@ void WriteBoard::sendCommand(unsigned char command, Board *bd) {
 
 }
 
-
-
 void WriteBoard::sendData(Board *bd)
 {
     QString text;
-    unsigned char buffer[264];
+    unsigned char buffer[265];
 
     qDebug()<<"sendData offset="<<offset;
 
-    buffer[0]=0xEF;
-    buffer[1]=0xFE;
-    buffer[2]=0x03;
-    buffer[3]=PROGRAM_METIS_FLASH;
-    buffer[4]=(blocks>>24)&0xFF;
-    buffer[5]=(blocks>>16)&0xFF;
-    buffer[6]=(blocks>>8)&0xFF;
-    buffer[7]=blocks&0xFF;
+    if (bd->getProtocol() == 1) {
+       buffer[0]=0xEF;
+       buffer[1]=0xFE;
+       buffer[2]=0x03;
+       buffer[3]=PROGRAM_METIS_FLASH;
+       buffer[4]=(blocks>>24)&0xFF;
+       buffer[5]=(blocks>>16)&0xFF;
+       buffer[6]=(blocks>>8)&0xFF;
+       buffer[7]=blocks&0xFF;
 
-    /*fill the frame with some data*/
-    for(int i=0;i<256;i++) {
-        buffer[i+8]=(unsigned char)data[i+offset];
+       /*fill the frame with some data*/
+       for(int i=0;i<256;i++) {
+           buffer[i+8]=(unsigned char)data[i+offset];
+       }
+    } else {
+       buffer[0]=0x00;
+       buffer[1]=0x00;
+       buffer[2]=0x00;
+       buffer[3]=0x00;
+       buffer[4]=PROGRAM_METIS_FLASH2;
+       buffer[5]=(blocks>>24)&0xFF;
+       buffer[6]=(blocks>>16)&0xFF;
+       buffer[7]=(blocks>>8)&0xFF;
+       buffer[8]=blocks&0xFF;
+
+       /*fill the frame with some data*/
+       for(int i=0;i<256;i++) {
+           buffer[i+9]=(unsigned char)data[i+offset];
+           send_checksum += (quint16)buffer[i+9];
+       }
     }
 
     if(socket->writeDatagram((const char*)buffer,sizeof(buffer),bd->getIpAddress(),1024)<0) {
@@ -188,7 +219,7 @@ void WriteBoard::sendData(Board *bd)
 
 // private function to send the command to erase
 void WriteBoard::eraseData(Board *bd) {
-     //qDebug("Erasing device ... (can take upto  seconds)");
+    qDebug("Erasing device ...");
     if ( boards[currentboard]->getBoardString() == "metis" ){
         stat->status(QString("Erasing device ... (can take upto %0 seconds)").arg(METIS_MAX_ERASE_TIMEOUTS/1000));
     }else if ( boards[currentboard]->getBoardString() == "hermes" ){
@@ -197,7 +228,7 @@ void WriteBoard::eraseData(Board *bd) {
         stat->status(QString("Erasing device ... (can take upto %0 seconds)").arg(ANGELIA_MAX_ERASE_TIMEOUTS/1000));
     }
 
-    sendCommand(ERASE_METIS_FLASH, bd);
+    sendCommand((bd->getProtocol() == 1) ? ERASE_METIS_FLASH : ERASE_METIS_FLASH2, bd);
 
     // wait to allow replys
     if ( boards[currentboard]->getBoardString() == "metis" ){
@@ -306,7 +337,7 @@ that card - (4 bytes).
 
  */
 
-void WriteBoard::changeIP(QStringList *saddr,  unsigned char* macaddr)
+void WriteBoard::changeIP(QStringList *saddr,  unsigned char* macaddr, Board *bd)
 {
     // send the changeIP packet
     unsigned char buffer[63];
@@ -325,26 +356,52 @@ void WriteBoard::changeIP(QStringList *saddr,  unsigned char* macaddr)
                  macaddr[0],macaddr[1],macaddr[2],macaddr[3],macaddr[4],macaddr[5]);
     qDebug() << " MAC "  << text;
 
-    buffer[0]=(char)0xEF; //header
-    buffer[1]=(char)0XFE;
-    buffer[2]=(char)0x03;
-    buffer[3]=macaddr[0];
-    buffer[4]=macaddr[1];
-    buffer[5]=macaddr[2];
-    buffer[6]=macaddr[3];
-    buffer[7]=macaddr[4];
-    buffer[8]=macaddr[5];
+    if (bd->getProtocol() == 1) {
+       buffer[0]=(char)0xEF; //header
+       buffer[1]=(char)0XFE;
+       buffer[2]=(char)0x03;
+       buffer[3]=macaddr[0];
+       buffer[4]=macaddr[1];
+       buffer[5]=macaddr[2];
+       buffer[6]=macaddr[3];
+       buffer[7]=macaddr[4];
+       buffer[8]=macaddr[5];
 
-    // the IP address from the interface
-    buffer[9]=(unsigned char)addr[0];
-    buffer[10]=(unsigned char)addr[1];
-    buffer[11]=(unsigned char)addr[2];
-    buffer[12]=(unsigned char)addr[3];
+       // the IP address from the interface
+       buffer[9]=(unsigned char)addr[0];
+       buffer[10]=(unsigned char)addr[1];
+       buffer[11]=(unsigned char)addr[2];
+       buffer[12]=(unsigned char)addr[3];
 
 
-    for(i=13;i<63;i++) {
-        buffer[i]=(char)0x00;
+       for(i=13;i<63;i++) {
+           buffer[i]=(char)0x00;
+       }
+    } else { // protocol2
+       buffer[0]=(char)0x00; //header
+       buffer[1]=(char)0X00;
+       buffer[2]=(char)0x00;
+       buffer[3]=(char)0x00;
+       buffer[4]=(char)0x03;
+       buffer[5]=macaddr[0];
+       buffer[6]=macaddr[1];
+       buffer[7]=macaddr[2];
+       buffer[8]=macaddr[3];
+       buffer[9]=macaddr[4];
+       buffer[10]=macaddr[5];
+
+       // the IP address from the interface
+       buffer[11]=(unsigned char)addr[0];
+       buffer[12]=(unsigned char)addr[1];
+       buffer[13]=(unsigned char)addr[2];
+       buffer[14]=(unsigned char)addr[3];
+
+
+       for(i=15;i<63;i++) {
+           buffer[i]=(char)0x00;
+       }
     }
+
     qDebug() << "buffer" << buffer;
 
     if(socket->writeDatagram((const char*)buffer,(qint64)sizeof(buffer),QHostAddress::Broadcast,1024)<0) {
@@ -373,6 +430,7 @@ void WriteBoard::readPending() {
 
 
         if(buffer[0]==0xEF && buffer[1]==0xFE) {
+            qDebug()<<"Protocol 1";
             switch(buffer[2]) {
                 case 4:  // ready for next buffer
                      qDebug()<<"ready for next buffer";
@@ -388,7 +446,7 @@ void WriteBoard::readPending() {
                     qDebug() << "Case 2";
                     if( 1  ) {
                         qDebug() << "******* " << &buffer[3] << buffer[9] << buffer[10];
-                        Board* bd=new Board(boardAddress.toIPv4Address(), &buffer[3], buffer[9], buffer[10]);
+                        Board* bd=new Board(boardAddress.toIPv4Address(), &buffer[3], buffer[9], buffer[10], 1, 0);
                         //if( !(MACaddr.contains( bd->getMACAddress())) ){
                             boards[bd->toAllString()] = bd;
                             MACaddr.append( bd->getMACAddress() );
@@ -402,6 +460,41 @@ void WriteBoard::readPending() {
                     // should not happen on this port
                     break;
            }
+        }
+        else if(buffer[0]==0x00 && buffer[1]==0x00 && buffer[2]==0x00 && buffer[3]==0x00) {
+            qDebug()<<"Protocol 2";
+            switch(buffer[4]) {
+                case 4:  // ready for next buffer
+                    qDebug()<<"ready for next buffer";
+                    recv_checksum = (quint16)(buffer[13]<<8) + buffer[14];
+                    emit nextBuffer();
+                    break;
+                case 3:  // reply
+                    // request eraseflash done
+                    qDebug() << "Case 3";
+                    emit eraseCompleted();
+                    state = ERASE_DONE;
+                    break;
+                case 2:  // response to a discovery packet
+                    qDebug() << "Case 2";
+                    if( 1  ) {
+                        qDebug() << "******* " << &buffer[5] << buffer[13] << buffer[11];
+                        Board* bd=new Board(boardAddress.toIPv4Address(), &buffer[5], buffer[13], buffer[11], 2, buffer[23]);
+                        //if( !(MACaddr.contains( bd->getMACAddress())) ){
+                            boards[bd->toAllString()] = bd;
+                            MACaddr.append( bd->getMACAddress() );
+                            qDebug() << "board address" << bd->toAllString();
+                            recv_checksum = 0;
+                            send_checksum = 0;
+                            return;
+                       // }
+                    }
+                    break;
+                case 1:  // a data packet
+                    qDebug() << "Case 1";
+                    // should not happen on this port
+                    break;
+          }
         } else {
             qDebug() << "received invalid response to discovery";
         }
@@ -415,8 +508,11 @@ void WriteBoard::incOffset()
     if(offset<end) {
         sendData(boards[currentboard]);
     }else{
-        stat->status(tr("Programming device completed successfully. (Will rediscovery board in %0 seconds)").arg(BOARD_DISCOVERY_DELAY/1000));
-        emit programmingCompleted();
+        if (send_checksum == recv_checksum) {
+           stat->status(tr("Programming device completed successfully. (Will rediscover board in %0 seconds)").arg(BOARD_DISCOVERY_DELAY/1000));
+           emit programmingCompleted();
+        } else
+           stat->status(tr("Programming device FAILED checksums mismatch, TRY AGAIN."));
     }
 
 }
