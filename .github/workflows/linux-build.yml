@@ -20,11 +20,11 @@ jobs:
       uses: actions/checkout@v2
     - name: Build
       run: |
-        cd HPSDRBootloader
+        cd HPSDRProgrammerV2-nopcap
         qmake
         make
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: HPSDRBootloader-linux-x64-${{ github.run_number }}-${{ github.sha }}
-        path: HPSDRBootloader/HPSDRBootloader
+        name: HPSDRProgrammerV2-nopcap-linux-x64-${{ github.run_number }}-${{ github.sha }}
+        path: HPSDRProgrammerV2-nopcap/HPSDRProgrammerV2-nopcap
