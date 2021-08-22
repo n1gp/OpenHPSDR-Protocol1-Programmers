@@ -32,7 +32,8 @@ jobs:
         cd HPSDRProgrammerV2-nopcap
         qmake -t vcapp
         msbuild
-        find . -iname Qt5Gui.dll -print
+        cd ..
+        dir Qt5Gui.dll /s
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
       with:
