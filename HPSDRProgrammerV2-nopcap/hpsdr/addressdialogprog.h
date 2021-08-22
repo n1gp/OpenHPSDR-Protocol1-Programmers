@@ -10,7 +10,7 @@
 
 
 #include <sys/types.h>
-#ifdef __WIN32
+#if defined(_WIN32) || defined(_WIN64)
 #include <winsock2.h>
 #else
 #include <sys/socket.h>
