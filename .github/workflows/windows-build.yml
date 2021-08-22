@@ -29,11 +29,11 @@ jobs:
         dir -r
     - name: Build
       run: |
-        cd HPSDRBootloader
+        cd HPSDRProgrammerV2-nopcap
         qmake -t vcapp
         msbuild
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
       with:
-        name: HPSDRBootloader-win32-${{ github.run_number }}-${{ github.sha }}
-        path: HPSDRBootloader/debug/HPSDRBootloader.exe
+        name: HPSDRProgrammerV2-nopcap-win32-${{ github.run_number }}-${{ github.sha }}
+        path: HPSDRProgrammerV2-nopcap/debug/HPSDRProgrammerV2-nopcap.exe
