@@ -462,6 +462,7 @@ void WriteBoard::readPending() {
            }
         }
         else if(buffer[0]==0x00 && buffer[1]==0x00 && buffer[2]==0x00 && buffer[3]==0x00) {
+            static int eraseAck = 0;
             qDebug()<<"Protocol 2";
             switch(buffer[4]) {
                 case 4:  // ready for next buffer
@@ -472,8 +473,12 @@ void WriteBoard::readPending() {
                 case 3:  // reply
                     // request eraseflash done
                     qDebug() << "Case 3";
-                    emit eraseCompleted();
-                    state = ERASE_DONE;
+                    if (!eraseAck) {
+                       eraseAck = 1;
+                    } else {
+                       emit eraseCompleted();
+                       state = ERASE_DONE;
+                    }
                     break;
                 case 2:  // response to a discovery packet
                     qDebug() << "Case 2";
@@ -486,6 +491,7 @@ void WriteBoard::readPending() {
                             qDebug() << "board address" << bd->toAllString();
                             recv_checksum = 0;
                             send_checksum = 0;
+                            eraseAck = 0;
                             return;
                        // }
                     }

@@ -53,6 +53,7 @@ Board::Board(quint32 ipaddr,unsigned char* macaddr,unsigned char software_versio
     boardtype[0] = "metis";
     boardtype[1] = "hermes";
     boardtype[2] = "griffin";
+    boardtype[3] = "angelia";
     boardtype[4] = (protocol == 1) ? "angelia" : "orion";
     boardtype[5] = (protocol == 1) ? "orion" : "orion2";
     boardtype[10] = (protocol == 1) ? "orion2" : "";

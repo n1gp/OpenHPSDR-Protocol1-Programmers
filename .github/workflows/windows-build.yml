@@ -39,8 +39,8 @@ jobs:
       with:
         name: HPSDRProgrammerV2-nopcap-win32-${{ github.run_number }}-${{ github.sha }}
         path: HPSDRProgrammerV2-nopcap/debug/HPSDRProgrammer_V2_nopcap.exe
-    - name: Upload Build DLL Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: dllfiles
-        path: D:/a/OpenHPSDR-Protocol1-Programmers/Qt/5.15.2/msvc2019_64/bin/*.dll
+#    - name: Upload Build DLL Artifacts
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: dllfiles
+#        path: D:/a/OpenHPSDR-Protocol1-Programmers/Qt/5.15.2/msvc2019_64/bin/*.dll
