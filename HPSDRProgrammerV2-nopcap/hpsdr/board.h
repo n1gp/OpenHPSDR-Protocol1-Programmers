@@ -60,7 +60,7 @@
 class Board
 {
 public:
-    Board(quint32 ipaddr,unsigned char* macaddr,unsigned char software_version,unsigned char board_type, unsigned char board_protocol, unsigned char beta_version);
+    Board(quint32 ipaddr,unsigned char* macaddr,unsigned char software_version,unsigned char board_type, unsigned char board_protocol, unsigned char beta_version, unsigned char board_speed1gb);
     QHash<int, QString> boardtype;
     QHash<int, QString> jumper;
     QHostAddress getIpAddress();
@@ -74,6 +74,7 @@ public:
     unsigned char getProtocol();
     unsigned char getVersion();
     unsigned char getBversion();
+    unsigned char getSpeed();
     unsigned char getBoard();
     QString getJumper();
     quint16 send_checksum;
@@ -86,6 +87,7 @@ private:
     unsigned char bversion;
     unsigned char board;
     unsigned char protocol;
+    unsigned char speed1gb;
 };
 
 #endif // BOARD_H

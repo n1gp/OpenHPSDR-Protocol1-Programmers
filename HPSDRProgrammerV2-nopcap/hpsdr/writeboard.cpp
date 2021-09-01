@@ -128,11 +128,17 @@ void WriteBoard::sendCommand(unsigned char command, Board *bd) {
        buffer[1]=0x00;
        buffer[2]=0x00;
        buffer[3]=0x00;
+       i = 5;
 
+       // setbit command
        buffer[4]=command;
+       if (command == 7) {
+          buffer[5]=(bd->getSpeed() == 1) ? 1 : 0;
+          i = 6;
+       }
 
        /*fill the frame with 0x00*/
-       for(i=5;i<60;i++) {
+       for(i=i;i<60;i++) {
            buffer[i]=(unsigned char)0x00;
        }
     }
@@ -143,17 +149,19 @@ void WriteBoard::sendCommand(unsigned char command, Board *bd) {
         return;
     }
 
-    QTimer *timer = new QTimer(this);
-    timer->setSingleShot(true);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update_command()));
-    if ( boards[currentboard]->getBoardString() == "metis" ){
-        timer->start(METIS_MAX_ERASE_TIMEOUTS);
-    }else if ( boards[currentboard]->getBoardString() == "hermes" ){
-        timer->start(HERMES_MAX_ERASE_TIMEOUTS);
-    }else if ( boards[currentboard]->getBoardString() == "angelia" ){
-        timer->start(ANGELIA_MAX_ERASE_TIMEOUTS);
-    }else {  // Orion
-        timer->start(ANGELIA_MAX_ERASE_TIMEOUTS);
+    if (!(bd->getProtocol() == 2 && command == 7)) {
+       QTimer *timer = new QTimer(this);
+       timer->setSingleShot(true);
+       connect(timer, SIGNAL(timeout()), this, SLOT(update_command()));
+       if ( boards[currentboard]->getBoardString() == "metis" ){
+           timer->start(METIS_MAX_ERASE_TIMEOUTS);
+       }else if ( boards[currentboard]->getBoardString() == "hermes" ){
+           timer->start(HERMES_MAX_ERASE_TIMEOUTS);
+       }else if ( boards[currentboard]->getBoardString() == "angelia" ){
+           timer->start(ANGELIA_MAX_ERASE_TIMEOUTS);
+       }else {  // Orion
+           timer->start(ANGELIA_MAX_ERASE_TIMEOUTS);
+       }
     }
 
 
@@ -446,7 +454,7 @@ void WriteBoard::readPending() {
                     qDebug() << "Case 2";
                     if( 1  ) {
                         qDebug() << "******* " << &buffer[3] << buffer[9] << buffer[10];
-                        Board* bd=new Board(boardAddress.toIPv4Address(), &buffer[3], buffer[9], buffer[10], 1, 0);
+                        Board* bd=new Board(boardAddress.toIPv4Address(), &buffer[3], buffer[9], buffer[10], 1, 0, 0);
                         //if( !(MACaddr.contains( bd->getMACAddress())) ){
                             boards[bd->toAllString()] = bd;
                             MACaddr.append( bd->getMACAddress() );
@@ -484,7 +492,7 @@ void WriteBoard::readPending() {
                     qDebug() << "Case 2";
                     if( 1  ) {
                         qDebug() << "******* " << &buffer[5] << buffer[13] << buffer[11];
-                        Board* bd=new Board(boardAddress.toIPv4Address(), &buffer[5], buffer[13], buffer[11], 2, buffer[23]);
+                        Board* bd=new Board(boardAddress.toIPv4Address(), &buffer[5], buffer[13], buffer[11], 2, buffer[23], buffer[26]&1);
                         //if( !(MACaddr.contains( bd->getMACAddress())) ){
                             boards[bd->toAllString()] = bd;
                             MACaddr.append( bd->getMACAddress() );

@@ -79,6 +79,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->discoverComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(boardSelected(int)));
 
     connect(ui->discoverButton,SIGNAL(clicked()),this,SLOT(discover()));
+    connect(ui->speedButton,SIGNAL(clicked()),this,SLOT(enet_speed()));
 
     connect(ui->programButton,SIGNAL(clicked()),this,SLOT(program()));
     connect(ui->browseButton,SIGNAL(clicked()),this,SLOT(browse()));
@@ -101,6 +102,7 @@ MainWindow::MainWindow(QWidget *parent) :
     } else {
        // dont allow discovery if no interface found
        ui->discoverButton->setEnabled(false);
+       ui->speedButton->setEnabled(false);
     }
 
 
@@ -129,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent) :
     wb = new WriteBoard( socket, stat);
 
     connect(wb,SIGNAL(discover()),this,SLOT(discover()));
+    connect(wb,SIGNAL(enet_speed()),this,SLOT(enet_speed()));
     connect(wb,SIGNAL(discoveryBoxUpdate()),this,SLOT(discoveryUpdate()));
     connect(wb,SIGNAL(eraseCompleted()),this,SLOT(eraseCompleted()));
     connect(wb,SIGNAL(programmingCompleted()),this,SLOT(programmingCompleted()));
@@ -204,6 +207,20 @@ void MainWindow::discover()
     qDebug() << "in MainWindow::discover after broadcast";
 }
 
+void MainWindow::enet_speed()
+{
+    qDebug() << "in MainWindow::enet_speed";
+    if (!wb->boards[wb->currentboard]) {
+       status(tr("Click on Discover first, NOTE: only supported on protocol2."));
+       return;
+    }
+
+    status(tr("Attempting to toggle ethernet speed on HPSDR board. (May take upto %0 seconds)").arg(BOARD_SETBITS_TIMEOUT/1000));
+    wb->sendCommand(0x07, wb->boards[wb->currentboard]);
+    qDebug() << "in MainWindow::enet_speed after sendCommand";
+    QTimer::singleShot(6000, this, SLOT(discover()));
+}
+
 void MainWindow::discoveryUpdate()
 {
     QString text;
@@ -235,7 +252,7 @@ void MainWindow::discoveryUpdate()
                                       tr("Discovery has failed\n"
                                          "If you have more that one interface, check you are using the correct one.  "
                                          "Check that the board is on and no jumper on J1 or J12.\n"
-                                         "You may need to use HPSDRBootloader."),
+                                         "TRY AGAIN, You may need to use HPSDRBootloader."),
                                        QMessageBox::Ok);
           return;
        }

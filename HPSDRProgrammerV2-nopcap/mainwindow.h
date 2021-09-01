@@ -76,6 +76,7 @@ signals:
 private slots:
     void interfaceSelected(int id);
     void boardSelected(int id);
+    void enet_speed();
     void discover();
     void discoveryUpdate();
     void browse();

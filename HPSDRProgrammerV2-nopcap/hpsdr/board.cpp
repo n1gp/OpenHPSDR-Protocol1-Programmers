@@ -40,7 +40,7 @@
  *  the discovered HPSDR interface boards.
  */
 
-Board::Board(quint32 ipaddr,unsigned char* macaddr,unsigned char software_version,unsigned char board_type, unsigned char board_protocol, unsigned char beta_version) {
+Board::Board(quint32 ipaddr,unsigned char* macaddr,unsigned char software_version,unsigned char board_type, unsigned char board_protocol, unsigned char beta_version, unsigned char board_speed1gb) {
     ipaddress=ipaddr;
     for(int i=0;i<6;i++) {
         macaddress[i]=macaddr[i];
@@ -49,6 +49,7 @@ Board::Board(quint32 ipaddr,unsigned char* macaddr,unsigned char software_versio
     bversion=beta_version;
     board=board_type;
     protocol=board_protocol;
+    speed1gb=board_speed1gb;
 
     boardtype[0] = "metis";
     boardtype[1] = "hermes";
@@ -104,10 +105,10 @@ QString Board::getHostAddress() {
 
 QString Board::toAllString() {
     QString text;
-    text.sprintf("%02X:%02X:%02X:%02X:%02x:%02X (%d.%d.%d.%d) Software version: %d.%d.%d (%s) P%d",
+    text.sprintf("%02X:%02X:%02X:%02X:%02x:%02X (%d.%d.%d.%d) FW version: %d.%d.%d (%s) P%d %dT",
                  macaddress[0],macaddress[1],macaddress[2],macaddress[3],macaddress[4],macaddress[5],
                  (ipaddress>>24)&0xFF,(ipaddress>>16)&0xFF,(ipaddress>>8)&0xFF,ipaddress&0xFF,
-                 version/10,version%10,bversion,boardtype[board].toStdString().c_str(), protocol);
+                 version/10,version%10,bversion,boardtype[board].toStdString().c_str(), protocol, speed1gb?1000:100);
     qDebug() << board << boardtype[0];
 
     return text;
@@ -175,6 +176,15 @@ unsigned char Board::getProtocol() {
 
 unsigned char Board::getVersion() {
     return version;
+}
+
+/*! \brief getSpeed()
+ *
+ *  This function returns the ethernet speed.
+ */
+
+unsigned char Board::getSpeed() {
+    return speed1gb;
 }
 
 /*! \brief getBversion()

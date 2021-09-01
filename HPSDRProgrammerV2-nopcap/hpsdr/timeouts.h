@@ -2,6 +2,7 @@
 #define TIMEOUTS_H
 
 #define BOARD_DISCOVERY_TIMEOUT  2000    // 2 seconds
+#define BOARD_SETBITS_TIMEOUT  6000    // 6 seconds
 #define BOARD_DISCOVERY_DELAY  10000      // 6 seconds
 #define METIS_MAX_ERASE_TIMEOUTS 20000   // 20 seconds
 #define HERMES_MAX_ERASE_TIMEOUTS 40000  // 40 seconds
