@@ -1,8 +1,8 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VERSION "(version 2.0.4.12)"
-#define RELEASE "2021-8-20"
+#define VERSION "(version 2.0.4.13)"
+#define RELEASE "2021-9-1"
 
 // KV0S revise interface
 // Version 2.0 move to Qt5,  revise GUI
@@ -15,6 +15,7 @@
 //2.0.4.10 (2014-7-2) - Disallow progamming with no file selected
 //2.0.4.11 (2014-11-9) - Short discovery delay (2 sec), add button for slow discover (12 sec)
 //2.0.4.12 (2021-8-20) - Added Protocol 2
+//2.0.4.13 (2021-9-1) - Added checksum verification and ability to toggle ethernet speed 100T / 1000T
 
 
 #endif // VERSION_H
